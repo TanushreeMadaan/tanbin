@@ -35,16 +35,42 @@ export const getAllUrl = async(
          }
     }
     catch(error){
-        res.status(500).send({message: "Something went wrong!"});
+       res.status(500).send({message: "Something went wrong!"});
     }
 };
 
 export const getUrl = async(
     req: express.Request,
     res: express.Response
-) => {};
+) => {
+
+    try {
+        const shortUrl = await urlModel.findOne({shortUrl: req.params.id})
+    if(!shortUrl){
+        res.status(404).send({message : "full URL not found"});
+    }
+    else{
+        shortUrl.clicks++;
+        shortUrl.save();
+        res.redirect(`${shortUrl.fullUrl}`);
+    }
+    } catch (error) {
+        res.status(500).send({message: "Something went wrong!"});
+    }
+    
+};
 
 export const deleteUrl = async(
     req: express.Request,
     res: express.Response
-) => {};
+) => {
+    
+    try {
+        const shortUrl = await urlModel.findByIdAndDelete({_id: req.params.id})
+    if(shortUrl){
+        res.status(200).send({message : "Requested Url has been deleted"});
+    }
+    } catch (error) {
+        res.status(500).send({message: "Something went wrong!"});
+    }
+};
